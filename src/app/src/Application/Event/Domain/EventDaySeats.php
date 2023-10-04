@@ -30,4 +30,9 @@ class EventDaySeats
     {
         $this->seats = $seats;
     }
+
+    public function getSeatsNumber() : int
+    {
+        return $this->seats;
+    }
 }

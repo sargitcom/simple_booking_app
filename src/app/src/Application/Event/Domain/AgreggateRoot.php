@@ -3,25 +3,44 @@
 namespace App\Application\Event\Domain;
 
 use App\Application\EventStore\Domain\DomainEvent;
+use Symfony\Component\Uid\Uuid;
 
 abstract class AggregateRoot
 {
-    private int $version = 1;
+    /**
+     * Uuid $id
+     */
+    protected Uuid $id;
+    
+    /**
+     * int $version
+     */
+    protected AgreggateVersion $version;
 
-    /** @var DomainEvent[] */
-    private array $events = [];
+    /** 
+     * @var DomainEvent[] 
+     */
+    protected array $events = [];
 
-    final public function getVersion() : int
+    final public function getId() : Uuid
+    {
+        return $this->id;
+    }
+
+    final public function getVersion() : AgreggateVersion
     {
         return $this->version;
     }
 
-    final public function incVersion() : void
+    final public function incVersion() : self
     {
-        $this->version++;
+        $this->version = $this->version->inc();
+        return $this;
     }
     
-    /** @return DomainEvent[] */
+    /**
+     *  @return DomainEvent[]
+     */
     final public function pullEvents(): array
     {
         $events = $this->events;

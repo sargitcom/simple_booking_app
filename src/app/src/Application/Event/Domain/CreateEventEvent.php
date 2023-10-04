@@ -8,13 +8,15 @@ use Symfony\Component\Uid\Uuid;
 
 class CreateEventEvent extends DomainEvent
 {
+    private int $version = 1;
     private EventName $eventName;
 
-    public function __construct(Uuid $aggregateId, EventName $eventName)
+    public function __construct(Uuid $aggregateId, EventName $eventName, int $version = 1)
     {
         parent::__construct($aggregateId);
 
         $this->eventName = $eventName;
+        $this->version = 1;
     }
 
     protected function getData() : DomainEventBody
@@ -22,6 +24,7 @@ class CreateEventEvent extends DomainEvent
         return DomainEventBody::create(
             [
                 'eventName' => $this->eventName->getEventName(),
+                'version' => $this->version,
             ]
         );
     }

@@ -7,7 +7,7 @@ use Throwable;
 
 class SeatsNumberIsNegativeException extends InvalidArgumentException
 {
-    public function __construct(int $seatsNumber, string $eventName, string $message = "", int $code = 0, ?Throwable $previous = null)
+    public function __construct(int $seatsNumber, string $message = "", int $code = 0, ?Throwable $previous = null)
     {
         if ($message !== "") {
             $message .= ",";

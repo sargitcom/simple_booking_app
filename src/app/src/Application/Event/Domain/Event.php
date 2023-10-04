@@ -6,7 +6,6 @@ use Symfony\Component\Uid\Uuid;
 
 class Event extends AggregateRoot
 {
-    private Uuid $id;
     private EventName $eventName;
 
     public function __construct(Uuid $id, EventName $eventName)
@@ -21,14 +20,14 @@ class Event extends AggregateRoot
             throw new EventDoesNotExistsException($this->id);
         }
 
-        $this->eventName = $eventName;
+        $this->setEventName($eventName);
 
-        $this->raise(new UpdateEventEvent($this->id, $eventName));
+        $this->raise(new UpdateEventEvent($this->getId(), $this->getEventName(), $this->incVersion()->getVersion()));
     }
 
-    public function save() : void
+    public function create() : void
     {
-        $this->raise(new CreateEventEvent($this->id, $this->eventName));
+        $this->raise(new CreateEventEvent($this->getId(), $this->getEventName(), $this->incVersion()->getVersion()));
     }
 
     private function setEventName(EventName $eventName) : self
@@ -37,5 +36,8 @@ class Event extends AggregateRoot
         return $this;
     }
 
-    
+    public function getEventName() : EventName
+    {
+        return $this->eventName;
+    }
 }
