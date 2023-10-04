@@ -8,13 +8,18 @@ use Symfony\Component\Uid\Uuid;
 class AvailableEventDay extends AggregateRoot
 {
     private Uuid $eventId;
+    private EventDaySeats $availableSeats;
     private int $day;
     private int $month;
     private int $year;
-    private EventDaySeats $availableSeats;
 
-    private function __construct(Uuid $id, Uuid $eventId, DateTime $date, EventDaySeats $availableSeats, AgreggateVersion $agreggateVersion)
-    {
+    private function __construct(
+        Uuid $id, 
+        Uuid $eventId, 
+        DateTime $date, 
+        EventDaySeats $availableSeats, 
+        AgreggateVersion $agreggateVersion
+    ) {
         $this->assertValidDate($date);
         $this->setId($id);
         $this->setEventId($eventId);
