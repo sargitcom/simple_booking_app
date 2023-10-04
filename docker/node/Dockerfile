@@ -1,0 +1,3 @@
+FROM node
+
+VOLUME [ "/app" ]

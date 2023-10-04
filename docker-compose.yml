@@ -1,0 +1,102 @@
+version: "3.5"
+services:
+
+  app-backend-redis:
+    image: redis:latest
+    networks:
+      - app_network_docker
+
+  app-backend-rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    #volumes:
+    #  - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+    #  - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+    networks:
+      - app_network_docker
+
+  app-backend-php-apache:
+    build:
+      context: .
+      dockerfile: ./docker/php-apache/Dockerfile
+    ports:
+      - "9080:80"
+    volumes:
+      - ./src/magick_pixel:/var/www/html
+      - ./docker/php-apache/conf.d/php.ini-development:/usr/local/etc/php/php.ini-development
+      - ./docker/php-apache/conf.d/php.ini-production:/usr/local/etc/php/php.ini-production
+      - ./docker/php-apache/conf.d/docker-php-ext-xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+    networks:
+      - app_network_docker
+
+  app-jenkins:
+    build:
+      context: .
+      dockerfile: ./jenkins/Dockerfile
+    ports:
+      - 9090:8080
+      - 50000:50000
+    volumes:
+      - ./jenkins/volume:/var/jenkins_home
+      - ./jenkins/prod-worker/keys:/keys/prod-worker
+    networks:
+      - app_network_docker
+
+  app-jenkins-ssh-agent-prod:
+    build:
+      context: .
+      dockerfile: ./jenkins-worker-prod/Dockerfile
+    ports:
+      - "2000:22"
+    environment:
+      - JENKINS_AGENT_SSH_PUBKEY=ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC61v3q2fS9qWZHXDDWwlRltEOiz8WLq8MEhrXkPXHQYxsOr+kY+QS0IiUPBzodRGn8OOPoDS6guJjWNIcGOWwgsCUj38h8cQfSSL8u89W9vOzyYnPzuVYLQllSblmfR20c3Hqwx4JRYs3CKoUrKqKBz72RvbEJbgd4Bsw1H5iVJZFpMmBU9iM3jWYSDdSXH0F7PhEZxCDQv2+FAxI4xQ71KHI8J+XKcczkDMOb1elZqhipDQ3PIueylu4kHVyXED6w8zjmzka6hZbV1FxtILK8Cdt+KNGj792UjbJwRPKnZ1Jm3pxbA00n0s+iosQTVY7i7K9oKKPdgLThhAhjR8VgE0ZXB21wjZJwOgxAMBKE5jvo2foUWnvR4qsRqfGbklnq2xG4wPYxkVgoXVGEOjKIjJtTpaTfvldWgDD56GqXVqO0FZxDebr2xknbS8jaG+WjMnqOjHBrbkztCUFd3ok3Whzq0yynv2zH1FVn2cybU7OU5WsbP1hl6g2eGdx0sgRJWolxLkRiDHTHI/4t6qoBSYQL7Qm5mzDYzWm73CqIO4hvH38WS3V4XViTWwOompdjCD89JcU4c/X9p4uHMRUVHTjUDrdQCMTBmzC72H6xIkRv6h9AUDXRat2cO9QQW9ducouRPJVu4DpGHdFOkC9bh6hx4k36rPe8zYDxcoGjrw== root@d85404b87e20
+    volumes:
+      - ./jenkins-worker-prod:/home/jenkins/agent/ansible
+    networks:
+      - app_network_docker
+
+  app-node:
+    image: current-buster
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./src-frontend:/app  
+
+###> doctrine/doctrine-bundle ###
+  database:
+    image: postgres:${POSTGRES_VERSION:-14}-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-app}
+      # You should definitely change the password in production
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-!ChangeMe!}
+      POSTGRES_USER: ${POSTGRES_USER:-app}
+    volumes:
+      - app-db-data:/var/lib/postgresql/data:rw
+    networks:
+      - app_network_docker
+      # You may use a bind-mounted host directory instead, so that it is harder to accidentally remove the volume and lose all your data!
+      # - ./docker/db/data:/var/lib/postgresql/data:rw
+###< doctrine/doctrine-bundle ###
+
+  pgadmin:
+    image: dpage/pgadmin4
+    ports:
+      - 9081:80
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=app@app.localhost
+      - PGADMIN_DEFAULT_PASSWORD=SuperSecret
+    networks:
+      - app_network_docker
+
+volumes:
+###> doctrine/doctrine-bundle ###
+  app-db-data:
+###< doctrine/doctrine-bundle ###
+
+networks:
+  app_network_docker:
+    name: app_network_docker
