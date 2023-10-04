@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="https://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="https://doctrine-project.org/schemas/orm/doctrine-mapping
+                          https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+
+    <entity name="App\Application\EventStore\Domain\LastProjectionEvent" table="`last_event_store_projection_event`">
+        <id name="id" type="bigint" column="id">
+            <generator strategy="SEQUENCE" />
+            <sequence-generator sequence-name="event_store_seq" allocation-size="1" initial-value="1" />
+        </id>
+
+        <embedded name="lastEventId" column="last_event_id"  class="App\Application\EventStore\Domain\LastEventId" use-column-prefix="false" />
+        <embedded name="projectionName" column="projection_name"  class="App\Application\EventStore\Domain\ProjectionName" use-column-prefix="false" />
+    </entity>
+</doctrine-mapping>

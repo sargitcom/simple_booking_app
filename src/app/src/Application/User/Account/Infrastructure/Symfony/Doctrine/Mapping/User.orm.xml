@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                          https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+
+    <entity name="App\Application\User\Account\Domain\User" table="`user`">
+        <id name="id" type="uuid" unique="true" column="id" />
+        <embedded name="name" column="name" class="App\Application\User\Account\Domain\Name" use-column-prefix="false" />
+        <embedded name="email" column="email" class="App\Application\User\Account\Domain\Email" use-column-prefix="false" />
+        <embedded name="password" column="password" class="App\Application\User\Account\Domain\Password" use-column-prefix="false" />
+        <embedded name="language" column="language"  class="App\Application\User\Account\Domain\Language" use-column-prefix="false" />
+        <field name="roles" column="roles" type="array" nullable="false" unique="false" />
+        <field name="isVerified" column="is_verified" type="boolean" nullable="false" unique="false" />
+    </entity>
+
+</doctrine-mapping>

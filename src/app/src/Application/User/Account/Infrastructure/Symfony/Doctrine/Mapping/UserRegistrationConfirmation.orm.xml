@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                          https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+
+    <entity name="App\Application\User\Account\Domain\UserRegistrationConfirmation" table="user_registration_confirmation">
+        <id name="id" type="bigint" column="id">
+            <generator strategy="SEQUENCE" />
+            <sequence-generator sequence-name="event_store_seq" allocation-size="1" initial-value="1" />
+        </id>
+        <field name="confirmationId" column="confirmation_id" type="uuid" unique="true" nullable="false" />
+        <field name="userId" column="user_id" type="uuid" unique="true" nullable="false" />
+        <field name="confirmationCode" column="confirmation_code" type="string" nullable="false" />
+        <field name="accountActivated" column="account_activated" type="boolean" nullable="false" default="false" />
+    </entity>
+</doctrine-mapping>
