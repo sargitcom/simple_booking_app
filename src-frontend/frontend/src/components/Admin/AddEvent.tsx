@@ -7,6 +7,7 @@ const AddEvent : React.FC = () => {
     const [isSaving, setIsSaving] = useState<boolean>(false);
     const [isError, setIsError] = useState<boolean>();
     const [refreshEvents, setRefreshEvents] = useState<boolean>(false);
+    const [wasSaved, setWasSaved] = useState<Boolean>(false);
 
     const updateEventNameHandler = (event : ChangeEvent<HTMLInputElement>) => {
         setEventName(event.target.value);
@@ -21,6 +22,7 @@ const AddEvent : React.FC = () => {
         setIsSaving(false);
         setIsError(false);
         setRefreshEvents(true);
+        setWasSaved(true);
     }
 
     const addEventHandler = () => {
@@ -49,12 +51,25 @@ const AddEvent : React.FC = () => {
 
       }, [refreshEvents]);
 
+    useEffect(() => {
+        if (!wasSaved) {
+            return;
+        }
+
+        const timeout = setTimeout(() => {
+            setWasSaved(false);
+            clearTimeout(timeout);
+        }, 1500);
+    }, [wasSaved]);
+
+
     return <>
         <div className={'add-event'}>
             <input type={"text"} onChange={updateEventNameHandler} value={eventName} />
             <button onClick={addEventHandler}>Add event</button>
             {isSaving && <p>Trwa zapisywanie...</p>}
             {isError && <p>Wystąpił błąd podczas zapisu. Spróbuj ponownie później</p>}
+            {wasSaved && <p>Utworzono nowy event</p>}
         </div>
     </>
 }
