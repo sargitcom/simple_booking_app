@@ -9,7 +9,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ReserveEventDays extends AbstractController
 {
-    #[Route(path: '/reserved_event_days/{eventId}', name: 'app_post_reserved_event_days', methods: ["POST"])]
+    #[Route(path: '/api/reserved_event_days/{eventId}', name: 'app_post_reserved_event_days', methods: ["POST"])]
     public function __invoke(Request $request, string $eventId) : Response
     {
         return $this->render('dashboard.html.twig');

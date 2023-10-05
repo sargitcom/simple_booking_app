@@ -1,15 +1,15 @@
 const BackendServer = {
-    host : 'https://app-backend-php-apache:9080/',
+    host : 'http://localhost:9080/index.php',
 }
 
 const Urls = {
-    addEvent : BackendServer.host + '/',
+    addEvent : BackendServer.host + '/api/event',
     
-    addEventAvailableSeats : BackendServer.host + '/',
+    addEventAvailableSeats : BackendServer.host + '/api/available_event_days',
 
-    reserveEventSeats : BackendServer.host + '/',
+    reserveEventSeats : BackendServer.host + '/api/reserved_event_days/{eventId}',
 
-    getEvents : BackendServer.host + '/',
+    getEvents : BackendServer.host + '/api/events/',
 }
 
 export const url = Urls;

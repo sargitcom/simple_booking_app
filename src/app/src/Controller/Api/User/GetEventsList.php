@@ -9,7 +9,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class GetEventsList extends AbstractController
 {
-    #[Route(path: '/events/{pageNumber}', name: 'app_put_event', methods: ["PUT"])]
+    #[Route(path: '/api/events/{pageNumber}', name: 'app_put_event', methods: ["GET"])]
     public function __invoke(Request $request, int $pageNumber = 1) : Response
     {
         return $this->render('dashboard.html.twig');

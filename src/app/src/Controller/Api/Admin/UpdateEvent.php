@@ -9,7 +9,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class UpdateEvent extends AbstractController
 {
-    #[Route(path: '/event/{id}', name: 'app_put_event', methods: ["PUT"])]
+    #[Route(path: '/api/event/{id}', name: 'app_put_event', methods: ["PUT"])]
     public function __invoke(Request $request, string $id) : Response
     {
         return $this->render('dashboard.html.twig');
