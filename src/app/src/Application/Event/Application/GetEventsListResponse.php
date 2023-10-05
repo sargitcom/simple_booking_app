@@ -2,7 +2,7 @@
 
 namespace App\Application\Event\Application;
 
-class GetEventsList
+class GetEventsListResponse
 {
 
 }
