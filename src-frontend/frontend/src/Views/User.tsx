@@ -2,13 +2,14 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import EventType from '../types/Event';
 import EventComponent from '../components/User/Event';
+import BackendServer from '../config/BackendServer';
 
 const User : React.FC = () => {
 
     const [events, setEvents] = useState<EventType[]>([]);
 
     useEffect(() => {
-        
+
     }, [])
 
     return <>

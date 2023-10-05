@@ -13,8 +13,6 @@ const Event : React.FC<{ event: EventType }> = ({ event }) => {
 
     const [value, onChange] = useState<Value>(new Date());
 
-    
-
     return <>
        <div>
             <h1>Event name: {Event.name}</h1>
