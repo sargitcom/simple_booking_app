@@ -2,12 +2,13 @@
 
 namespace App\Application\EventStore\Domain;
 
+use App\Application\Event\Domain\AgreggateVersion;
 use DateTimeImmutable;
 use Symfony\Component\Uid\Uuid;
 
 abstract class DomainEvent
 {
-    protected int $version = 1;
+    protected AgreggateVersion $version;
 
     protected Uuid $aggregateId;
 
@@ -29,7 +30,7 @@ abstract class DomainEvent
 
     protected function getVersion() : int
     {
-        return $this->version;
+        return $this->version->getVersion();
     }
 
     abstract protected function getData() : DomainEventBody;
@@ -39,7 +40,7 @@ abstract class DomainEvent
         return new EventStore(
             $eventId,
             $this->aggregateId,
-            $this->version,
+            $this->version->getVersion(),
             $this->getEventName(),
             $this->getData(),
             new DateTimeImmutable(),

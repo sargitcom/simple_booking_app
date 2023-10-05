@@ -8,7 +8,6 @@ use Symfony\Component\Uid\Uuid;
 
 class UpdateEventEvent extends DomainEvent
 {
-    private AgreggateVersion $version;
     private EventName $eventName;
 
     public function __construct(Uuid $aggregateId, EventName $eventName, AgreggateVersion $version)
@@ -16,7 +15,7 @@ class UpdateEventEvent extends DomainEvent
         parent::__construct($aggregateId);
 
         $this->eventName = $eventName;
-        $this->version = $version;
+        $this->version = AgreggateVersion::create();
     }
 
     protected function getData() : DomainEventBody

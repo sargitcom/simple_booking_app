@@ -8,8 +8,7 @@ use Symfony\Component\Uid\Uuid;
 
 class CreateEventEvent extends DomainEvent
 {
-    private AgreggateVersion $version;
-    private EventName $eventName;
+    protected EventName $eventName;
 
     public function __construct(Uuid $aggregateId, EventName $eventName)
     {
