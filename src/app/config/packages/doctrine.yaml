@@ -35,13 +35,26 @@ doctrine:
                 prefix: 'App\Application\User\Account\Domain'
                 alias: User
 
-            App\Application\Tracking\TrackingPixel\Domain\Application\Pixel:
+            App\Application\Event\Domain\Event:
                 is_bundle: false
                 type: xml
-                dir: '%kernel.project_dir%/src/Application/Tracking/TrackingPixel/Infrastructure/Symfony/Doctrine/Mapping/Application'
-                prefix: 'App\Application\Tracking\TrackingPixel\Domain\Application'
-                alias: PixelApplication
+                dir: '%kernel.project_dir%/src/Application/Event/Domain'
+                prefix: 'App\Application\Event\Domain\'
+                alias: Event
 
+            App\Application\Event\Domain\AvailableEventDay:
+                is_bundle: false
+                type: xml
+                dir: '%kernel.project_dir%/src/Application/Event/Domain'
+                prefix: 'App\Application\Event\Domain\'
+                alias: Event
+
+            App\Application\Event\Domain\ReservedEventDay:
+                is_bundle: false
+                type: xml
+                dir: '%kernel.project_dir%/src/Application/Event/Domain'
+                prefix: 'App\Application\Event\Domain\'
+                alias: Event
 when@test:
     doctrine:
         dbal:

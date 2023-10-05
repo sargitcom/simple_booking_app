@@ -7,9 +7,10 @@
     <entity name="App\Application\Event\Domain\AvailableEventDay" table="`available_event_day`">
         <id name="id" type="uuid" unique="true" column="id" />
         <field name="eventId" type="uuid" column="event_id" />
-        <embedded name="availableSeats" column="available_seats"  class="App\Application\Event\Domain\EventDaySeats" use-column-prefix="false" />
+        <embedded name="availableSeats" column="available_seats" class="App\Application\Event\Domain\EventDaySeats" use-column-prefix="false" />
         <field name="day" type="integer" column="day" />
         <field name="month" type="integer" column="month" />
         <field name="year" type="integer" column="year" />
+        <embedded name="version" column="version" class="App\Application\Event\Domain\AgreggateVersion" use-column-prefix="false" />
     </entity>
 </doctrine-mapping>

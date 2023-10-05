@@ -6,6 +6,7 @@
 
     <entity name="App\Application\Event\Domain\Event" table="`available_event_day`">
         <id name="id" type="uuid" unique="true" column="id" />
-        
+        <embedded name="eventName" column="version" class="App\Application\Event\Domain\EventName" use-column-prefix="false" />
+        <embedded name="version" column="version" class="App\Application\Event\Domain\AgreggateVersion" use-column-prefix="false" />
     </entity>
 </doctrine-mapping>
