@@ -6,7 +6,7 @@ use App\Application\EventStore\Domain\DomainEvent;
 use App\Application\EventStore\Domain\DomainEventBody;
 use Symfony\Component\Uid\Uuid;
 
-class UpdateAvailableSeatsNumberEvent extends DomainEvent
+class IncreaseAvailableSeatsNumberEvent extends DomainEvent
 {
     private EventDaySeats $requestedSeatsNumber;
     private AgreggateVersion $aggregateVersion;

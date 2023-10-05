@@ -9,7 +9,7 @@ class EventDayReservation
     private Uuid $eventId;
     private EventDayCollection $reservedDays;
 
-    public function __construct(Uuid $eventId, EventDayCollection $reservedDays)
+    public function __construct(Uuid $eventId, ReservedEventDayCollection $reservedDays)
     {
         
     }

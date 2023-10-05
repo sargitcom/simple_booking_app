@@ -27,7 +27,7 @@ class Event extends AggregateRoot
 
     public function create() : void
     {
-        $this->raise(new CreateEventEvent($this->getId(), $this->getEventName(), $this->incVersion()->getVersion()));
+        $this->raise(new CreateEventEvent($this->getId(), $this->getEventName()));
     }
 
     private function setEventName(EventName $eventName) : self

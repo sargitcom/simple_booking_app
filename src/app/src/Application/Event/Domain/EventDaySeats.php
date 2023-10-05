@@ -15,7 +15,12 @@ class EventDaySeats
     public static function create(int $seats) : self
     {
         return new self($seats);
-    }   
+    }
+
+    public function add(EventDaySeats $eventDaySeats) : self
+    {
+        return new self($this->getSeatsNumber() + $eventDaySeats->getSeatsNumber());
+    }
 
     private function assertSeatsNumberIsNotNegative(int $seats) : void
     {

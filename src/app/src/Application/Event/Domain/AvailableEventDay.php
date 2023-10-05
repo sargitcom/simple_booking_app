@@ -15,7 +15,7 @@ class AvailableEventDay extends AggregateRoot
 
     private function __construct(
         Uuid $id, 
-        Uuid $eventId, 
+        Uuid $eventId,
         DateTime $date, 
         EventDaySeats $availableSeats, 
         AgreggateVersion $agreggateVersion
@@ -30,9 +30,25 @@ class AvailableEventDay extends AggregateRoot
         $this->setAggregateVersion($agreggateVersion);
     }
 
-    static function create(Uuid $id, DateTime $date, EventDaySeats $availableSeats) : self
+    static function create(
+        Uuid $id, 
+        Uuid $eventId, 
+        DateTime $date, 
+        EventDaySeats $availableSeats, 
+        AgreggateVersion $agreggateVersion
+    ) : self {
+        return new self($id, $eventId, $date, $availableSeats, $agreggateVersion);
+    }
+
+    public function increaseSeatsNumber(EventDaySeats $seatsNumber) : self
     {
-        return new self($id, $date);
+        $this->raise(new IncreaseAvailableSeatsNumberEvent(
+            $this->getId(),
+            $seatsNumber->add($seatsNumber),
+            $this->getVersion()->inc()
+        ));
+
+        return $this;
     }
 
     public function reduceSeatsNumber(EventDaySeats $seatsNumber) : self
@@ -44,10 +60,10 @@ class AvailableEventDay extends AggregateRoot
             throw new NotEnougthSeatsNumberException($requestedSeatsNumber, $availableSeatsNumber);
         }
 
-        $this->raise(new UpdateAvailableSeatsNumberEvent(
+        $this->raise(new DecreaseAvailableSeatsNumberEvent(
             $this->getId(),
             $seatsNumber,
-            $this->getVersion()
+            $this->getVersion()->inc()
         ));
 
         return $this;

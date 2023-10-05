@@ -4,17 +4,21 @@ namespace App\Application\Event\Domain;
 
 use Iterator;
 
-class EventDayCollection implements Iterator
+class ReservedEventDayCollection implements Iterator
 {
     private int $index = 0;
+    
+    /**
+     * @var ReservedEventDay[] $data
+     */
     private array $data = [];
 
-    public function append(EventDay $eventDay) : void
+    public function append(ReservedEventDay $eventDay) : void
     {
         $this->data[] = $eventDay;
     }
 
-    public function current(): EventDay
+    public function current(): ReservedEventDay
     {
         return $this->data[$this->index];
     }
