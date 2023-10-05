@@ -60,11 +60,7 @@ class AvailableEventDay extends AggregateRoot
             throw new NotEnougthSeatsNumberException($requestedSeatsNumber, $availableSeatsNumber);
         }
 
-        $this->raise(new DecreaseAvailableSeatsNumberEvent(
-            $this->getId(),
-            $seatsNumber,
-            $this->getVersion()->inc()
-        ));
+        $this->availableSeats = EventDaySeats::create($availableSeatsNumber - $requestedSeatsNumber);
 
         return $this;
     }

@@ -20,7 +20,7 @@ use Symfony\Component\Uid\Uuid;
  */
 class SymfonyEventStoreRepository extends ServiceEntityRepository implements EventStoreRepository
 {
-    public const EVENT_STORE_NOTIFICATION_CHANNEL = 'serp_event_store';
+    public const EVENT_STORE_NOTIFICATION_CHANNEL = 'event_store_new_event';
 
     public function __construct(ManagerRegistry $registry)
     {

@@ -6,11 +6,11 @@ use App\Application\EventStore\Domain\DomainEvent;
 use App\Application\EventStore\Domain\DomainEventBody;
 use Symfony\Component\Uid\Uuid;
 
-class UpdateEventEvent extends DomainEvent
+class CreateEventEvent extends DomainEvent
 {
-    private EventName $eventName;
+    protected EventName $eventName;
 
-    public function __construct(Uuid $aggregateId, EventName $eventName, AgreggateVersion $version)
+    public function __construct(Uuid $aggregateId, EventName $eventName)
     {
         parent::__construct($aggregateId);
 
