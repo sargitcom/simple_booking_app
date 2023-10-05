@@ -4,7 +4,7 @@
                   xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
                           https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
 
-    <entity name="App\Application\Event\Domain\ReservedEventDay" table="`available_event_day`">
+    <entity name="App\Application\Event\Domain\ReservedEventDay" table="`reserved_event_day`">
 <id name="id" type="uuid" unique="true" column="id" />
         <field name="eventId" type="uuid" column="event_id" />
         <embedded name="reservedSeats" column="reserved_seats" class="App\Application\Event\Domain\EventDaySeats" use-column-prefix="false" />

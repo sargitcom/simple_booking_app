@@ -4,9 +4,9 @@
                   xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
                           https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
 
-    <entity name="App\Application\Event\Domain\Event" table="`available_event_day`">
+    <entity name="App\Application\Event\Domain\Event" table="`event`">
         <id name="id" type="uuid" unique="true" column="id" />
-        <embedded name="eventName" column="version" class="App\Application\Event\Domain\EventName" use-column-prefix="false" />
+        <embedded name="eventName" column="event_name" class="App\Application\Event\Domain\EventName" use-column-prefix="false" />
         <embedded name="version" column="version" class="App\Application\Event\Domain\AgreggateVersion" use-column-prefix="false" />
     </entity>
 </doctrine-mapping>

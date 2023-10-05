@@ -61,7 +61,7 @@ services:
     ports:
       - 9081:80
     environment:
-      - PGADMIN_DEFAULT_EMAIL=app@app.localhost
+      - PGADMIN_DEFAULT_EMAIL=sargitcom@gmail.com
       - PGADMIN_DEFAULT_PASSWORD=SuperSecret
     networks:
       - app_network_docker

@@ -38,23 +38,23 @@ doctrine:
             App\Application\Event\Domain\Event:
                 is_bundle: false
                 type: xml
-                dir: '%kernel.project_dir%/src/Application/Event/Domain'
-                prefix: 'App\Application\Event\Domain\'
+                dir: '%kernel.project_dir%/src/Application/Event/Infrastructure/Symfony/Doctrine/Mapping'
+                prefix: 'App\Application\Event\Domain'
                 alias: Event
 
             App\Application\Event\Domain\AvailableEventDay:
                 is_bundle: false
                 type: xml
-                dir: '%kernel.project_dir%/src/Application/Event/Domain'
-                prefix: 'App\Application\Event\Domain\'
-                alias: Event
+                dir: '%kernel.project_dir%/src/Application/Event/Infrastructure/Symfony/Doctrine/Mapping'
+                prefix: 'App\Application\Event\Domain'
+                alias: AvailableEventDay
 
             App\Application\Event\Domain\ReservedEventDay:
                 is_bundle: false
                 type: xml
-                dir: '%kernel.project_dir%/src/Application/Event/Domain'
-                prefix: 'App\Application\Event\Domain\'
-                alias: Event
+                dir: '%kernel.project_dir%/src/Application/Event/Infrastructure/Symfony/Doctrine/Mapping'
+                prefix: 'App\Application\Event\Domain'
+                alias: ReservedEventDay
 when@test:
     doctrine:
         dbal:
