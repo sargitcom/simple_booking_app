@@ -66,6 +66,15 @@ services:
     networks:
       - app_network_docker
 
+  node:
+    build:
+      context: .
+      dockerfile: ./docker/node/Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./src-frontend:/app
+
 volumes:
 ###> doctrine/doctrine-bundle ###
   app-db-data:

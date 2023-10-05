@@ -2,8 +2,6 @@
 
 namespace App\Form;
 
-use App\Application\User\Account\Domain\User;
-use App\Controller\ReserveEventDays;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
