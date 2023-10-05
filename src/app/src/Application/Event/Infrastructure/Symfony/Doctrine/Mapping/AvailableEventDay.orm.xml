@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                          https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+
+    <entity name="App\Application\Event\Domain\AvailableEventDay" table="`available_event_day`">
+        <id name="id" type="uuid" unique="true" column="id" />
+        <field name="eventId" type="uuid" column="event_id" />
+        <embedded name="availableSeats" column="available_seats"  class="App\Application\Event\Domain\EventDaySeats" use-column-prefix="false" />
+        <field name="day" type="integer" column="day" />
+        <field name="month" type="integer" column="month" />
+        <field name="year" type="integer" column="year" />
+    </entity>
+</doctrine-mapping>
