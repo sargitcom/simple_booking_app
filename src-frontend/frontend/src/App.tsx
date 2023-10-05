@@ -1,24 +1,28 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, {useState} from 'react';
+
+import "./App.css";
+
+import Admin from './Views/Admin';
+import User from './Views/User';
 
 function App() {
+  const [isShowAdmin, setIsShowAdmin] = useState<Boolean>(false);
+
+  const showAdminHandler = () => {
+    setIsShowAdmin(true);
+  }
+
+  const showUserHandler = () => {
+    setIsShowAdmin(false);
+  }
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <button onClick={showAdminHandler}>Admin</button>
+      <button onClick={showUserHandler}>User</button>
+
+      {isShowAdmin && <Admin />}
+      {!isShowAdmin && <User />}
     </div>
   );
 }
