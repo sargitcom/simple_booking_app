@@ -7,9 +7,7 @@ use App\Application\Event\Domain\AvailableEventDayCollection;
 use App\Application\Event\Domain\AvailableEventDayRepository;
 use App\Application\Event\Domain\AvailableEventDaysObsoleteVersionException;
 use App\Application\Event\Domain\CouldNotReserveSeatsException;
-use App\Application\Event\Domain\Event;
-use App\Application\Event\Domain\FullEventCollection;
-use App\Application\Event\Domain\NotEnougthSeatsNumberException;
+use App\Application\Event\Domain\NotEnoughtSeatsAvailableException;
 use App\Application\Event\Infrastructure\Symfony\Doctrine\AvailableEventDaysObsoleteVersionException as DoctrineAvailableEventDaysObsoleteVersionException;
 use App\Application\EventStore\Domain\ProjectionName;
 use DateTime;
@@ -64,26 +62,30 @@ class SymfonyDoctrineAvailableEventDayRepository extends ServiceEntityRepository
         $retriesNumber = 5; // this can set using DI as a config param - for simplicity left as hardcoded value
 
         do {
+            --$retriesNumber;
+
             try {
-                $this->tryToreserveEventDays($eventId, $startDate, $endDate, $seatsNumber);
+                $this->tryToReserveEventDays($eventId, $startDate, $endDate, $seatsNumber);
             } catch (DoctrineAvailableEventDaysObsoleteVersionException) {
                 $shouldRetry = true;
+            } catch (Exception $e) {
+                throw $e;
             }
         } while ($shouldRetry && $retriesNumber > 0);
 
         if ($shouldRetry && $retriesNumber === 0) throw new CouldNotReserveSeatsException();
     }
 
-    protected function tryToreserveEventDays(Uuid $uuid, DateTime $startDate, DateTime $endDate, int $seatsNumber) : void
+    protected function tryToReserveEventDays(Uuid $uuid, DateTime $startDate, DateTime $endDate, int $seatsNumber) : void
     {
         if ($this->areAvailableSeats($uuid, $startDate, $endDate, $seatsNumber) === false) {
-            throw new Exception("There`s not enought seats available");
+            throw new NotEnoughtSeatsAvailableException("There`s not enought seats available");
         }
 
         $availableEventDays = $this->getAvailableEventDaysSeatsByRange($uuid, $startDate, $endDate);
 
         if ($this->areEnoughtDaysInCollection($availableEventDays, $startDate, $endDate) === false) {
-            throw new Exception("There`s not enought seats available");
+            throw new NotEnoughtSeatsAvailableException("There`s not enought seats available");
         }
 
         $availableEventDays->reduceSeatsNumber($seatsNumber);
@@ -92,9 +94,9 @@ class SymfonyDoctrineAvailableEventDayRepository extends ServiceEntityRepository
 
         try {
             $this->updateAvailableEventDaysSeatsNumber($availableEventDays);
-        } catch(Throwable) {
+        } catch(Throwable $ex) {
             $this->_em->getConnection()->rollBack();
-            throw new Exception("Can`t process seat update");
+            throw new Exception("not enought seats");
         }
 
         $this->_em->getConnection()->commit();

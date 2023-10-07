@@ -16,6 +16,7 @@ class ReserveEventDaysResponse
         private Uuid $eventId,
         private bool $isReserved,
         private bool $isError,
+        private string $message,
     ) {}
 
     public function getEventId() : string
@@ -31,5 +32,10 @@ class ReserveEventDaysResponse
     public function isError() : bool
     {
         return $this->isError;
+    }
+
+    public function getMessage() : string
+    {
+        return $this->message;
     }
 }

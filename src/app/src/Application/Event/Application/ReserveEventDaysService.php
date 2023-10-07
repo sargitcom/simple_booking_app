@@ -3,6 +3,9 @@
 namespace App\Application\Event\Application;
 
 use App\Application\Event\Domain\AvailableEventDayRepository;
+use App\Application\Event\Domain\CouldNotReserveSeatsException;
+use App\Application\Event\Domain\NotEnoughtSeatsAvailableException;
+use App\Application\Event\Infrastructure\Symfony\Doctrine\AvailableEventDaysObsoleteVersionException;
 use Throwable;
 
 class ReserveEventDaysService
@@ -27,17 +30,30 @@ class ReserveEventDaysService
             return new ReserveEventDaysResponse(
                 $request->getEventId(),
                 ReserveEventDaysResponse::IS_RESERVED,
-                ReserveEventDaysResponse::IS_NO_ERROR
+                ReserveEventDaysResponse::IS_NO_ERROR,
+                'Seats reserved',
             );
-        } catch (Throwable $e) {
-
-            var_dump($e->getMessage());
-            die;
-
+            
+        } catch (AvailableEventDaysObsoleteVersionException) {
             return new ReserveEventDaysResponse(
                 $request->getEventId(),
                 ReserveEventDaysResponse::IS_NOT_RESERVED,
-                ReserveEventDaysResponse::IS_ERROR
+                ReserveEventDaysResponse::IS_ERROR,
+                'Seats not reserved. Too much traffic.',
+            );   
+        } catch (NotEnoughtSeatsAvailableException | CouldNotReserveSeatsException) {
+            return new ReserveEventDaysResponse(
+                $request->getEventId(),
+                ReserveEventDaysResponse::IS_NOT_RESERVED,
+                ReserveEventDaysResponse::IS_ERROR,
+                'Seats not reserved. Not enough seats.',
+            );            
+        } catch (Throwable $e) {
+            return new ReserveEventDaysResponse(
+                $request->getEventId(),
+                ReserveEventDaysResponse::IS_NOT_RESERVED,
+                ReserveEventDaysResponse::IS_ERROR,
+                'Seats not reserved. Unknown error.',
             );
         }     
     }  

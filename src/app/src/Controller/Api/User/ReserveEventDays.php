@@ -34,31 +34,25 @@ class ReserveEventDays extends AbstractController
     
             $reserveRequest = new ReserveEventDaysRequest($eventId, $startDate, $endDate, $seatsNumber);
     
-            $this->reserveEventDaysService->reserveSeats($reserveRequest);
+            $serviceResponse = $this->reserveEventDaysService->reserveSeats($reserveRequest);
     
             $response = [
-                'isError' => false,
+                'isError' => $serviceResponse->isError(),
+                'msg' => $serviceResponse->getMessage(),
                 'event' => [
                     'reservation' => [
                         'eventId' => $eventId,
-                        'reservationId' => 1,
-                        'startAt' => new DateTime(),
-                        'endAt' => new DateTime(),
-                        'seats' => 1
                     ]
                 ],
                 'links' => [
-                    'cancelEventSeats' => 'http://localhost:3000/event/seats/1', // DELETE
+                    // 'cancelEventSeats' => 'http://localhost:3000/event/seats/1', // DELETE
                 ]
             ];
     
             return new JsonResponse($response);
-        } catch (Throwable $e) {
-
-            var_dump($e->getMessage());
-            die;
-
+        } catch (Throwable) {
             return new JsonResponse([
+                'msg' => 'Uknown error',
                 'isError' => true,
             ]);
         }        
