@@ -6,7 +6,7 @@ use App\Application\EventStore\Domain\DomainEvent;
 use App\Application\EventStore\Domain\DomainEventBody;
 use Symfony\Component\Uid\Uuid;
 
-class CreateEventEvent extends DomainEvent
+class EventDaysReservedEvent extends DomainEvent
 {
     protected EventName $eventName;
 

@@ -1,5 +1,7 @@
 <?php
 
+namespace App\Application\Event\Infrastructure\Symfony\Doctrine;
+
 use App\Application\Event\Domain\AvailableEventDay;
 use App\Application\Event\Domain\AvailableEventDayCollection;
 use App\Application\Event\Domain\AvailableEventDayRepository;
@@ -8,8 +10,10 @@ use App\Application\Event\Domain\Event;
 use App\Application\Event\Domain\FullEventCollection;
 use App\Application\Event\Domain\NotEnougthSeatsNumberException;
 use App\Application\EventStore\Domain\ProjectionName;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Exception;
 use Symfony\Component\Uid\Uuid;
 
 /**
@@ -44,60 +48,109 @@ class SymfonyDoctrineAvailableEventDayRepository extends ServiceEntityRepository
         }
     }
 
+    public function getReservedDays(Uuid $uuid, DateTime $startDate, DateTime $endDate) : AvailableEventDayCollection
+    {
+        $collection = new AvailableEventDayCollection();
+
+        return $collection;
+    }
+
     public function reserveEventDays(Uuid $uuid, DateTime $startDate, DateTime $endDate, int $seatsNumber) : void
     {
-        if ($this->isRequiredDateRangeCoveredByAvailableSeats($uuid, $startDate, $endDate) === false) {
-            throw new Exception("Date range do not overlapp");
+        if ($this->areAvailableSeats($uuid, $startDate, $endDate, $seatsNumber) === false) {
+            throw new Exception("There`s not enought seats available");
         }
+
+        $availableEventDays = $this->getAvailableEventDaysSeatsByRange($uuid, $startDate, $endDate);
+
+        dd($availableEventDays);
+
+
+        /*
+        if ($this->isEnoughAvailableSeats($availableEventDays, $seatsNumber) === false) {
+            throw new Exception("Not enough seats");
+        }
+        */
+
+        /*
+        die('q');
 
         $isError = false;
         $i = 0;
+        */
 
-        do {
-            try {
-                $i++;
-
-                $availableEventDays = $this->getAvailableEventDaysByRange($uuid, $startDate, $endDate);
-
-                /**
-                * @throws Exception
-                */
-                $this->updateAvailableEventDaysSeatsNumber($availableEventDays, $startDate, $endDate, $seatsNumber);
-
-
-                $this->beginTransaction();
+        //do {
+            //try {
+              //  $i++;
 
                 /**
                 * @throws Exception
                 */
-                $this->tryToUpdateAvailableSeats($availableEventDays);
+                //$this->updateAvailableEventDaysSeatsNumber($availableEventDays, $startDate, $endDate, $seatsNumber);
 
-                $this->commitTransaction();
 
-                break;
-            } catch (NotEnougthSeatsNumberException) {
+                //$this->beginTransaction();
 
-            } catch (AvailableEventDaysObsoleteVersionException) {
-                $this->rollbackTransaction();
-            }
-        } while ($i <= 5);
+                /**
+                * @throws Exception
+                */
+                //$this->tryToUpdateAvailableSeats($availableEventDays);
+
+                //$this->commitTransaction();
+
+            //  break;
+            //} catch (NotEnougthSeatsNumberException) {
+
+            //} catch (AvailableEventDaysObsoleteVersionException) {
+                //$this->rollbackTransaction();
+            //}
+        //} while ($i <= 5);
 
         // tutaj walna error jezeli taka koniecznosc throw new CantUpd();
     }
 
-    protected function isRequiredDateRangeCoveredByAvailableSeats()
-    {
+    protected function areAvailableSeats(
+        Uuid $eventId, 
+        DateTime $startDate, 
+        DateTime $endDate, 
+        int $seatsNumber
+    ) : bool {
+        $interval = $startDate->diff($endDate);
+        $daysToReserve = $interval->days > 0 ? $interval->days + 1 : 1;
 
+        $sql = <<<SQL
+SELECT 
+count(aed.event_id) FROM available_event_day as aed 
+WHERE aed.event_id = :eventId AND
+to_date(concat(aed.year, '-', aed.month, '-', aed.day), 'YYYY-MM-DD') >= :startDate AND
+to_date(concat(aed.year, '-', aed.month, '-', aed.day), 'YYYY-MM-DD') <= :endDate AND
+aed.seats >= $seatsNumber
+SQL;
+
+        $conn = $this->getEntityManager()->getConnection();
+
+        $stmt = $conn->prepare($sql);
+        $stmt->bindValue(':eventId', $eventId->toRfc4122());
+        $stmt->bindValue(':startDate', $startDate->format('Y-m-d'));
+        $stmt->bindValue(':endDate', $endDate->format('Y-m-d'));
+
+        $results = $stmt->executeQuery();
+
+        return $results->fetchFirstColumn()[0] === $daysToReserve;
     }
 
-    protected function getAvailableEventDaysByRange(Uuid $eventId, DateTime $startDate, DateTime $endDate) : AvailableEventDayCollection
+    protected function getAvailableEventDaysSeatsByRange(Uuid $eventId, DateTime $startDate, DateTime $endDate) : AvailableEventDayCollection
     {
+
         $qb = $this->_em->createQueryBuilder();
         $query = $qb->select('aed')
             ->from(AvailableEventDay::class, 'aed')
-            ->where('eventId', '=', $eventId)
-            ->andWhere("TO_DATE(concat(year, '-', month, '-', day), 'YYYY-MM-DD')", ">=", $startDate->format('Y-m-d'))
-            ->andWhere("TO_DATE(concat(year, '-', month, '-', day), 'YYYY-MM-DD')", "<=", $endDate->format('Y-m-d'))
+            ->where('aed.eventId = :eventId')
+            ->andWhere("to_date(concat(aed.year, '-', aed.month, '-', aed.day), 'YYYY-MM-DD') >= :startDate")
+            ->andWhere("to_date(concat(aed.year, '-', aed.month, '-', aed.day), 'YYYY-MM-DD') <= :endDate")
+            ->setParameter(':eventId', $eventId->toRfc4122())
+            ->setParameter(':startDate', $startDate->format('Y-m-d'))
+            ->setParameter(':endDate', $endDate->format('Y-m-d'))
             ->getQuery();
 
         /**

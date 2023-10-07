@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Application\Event\Domain;
+namespace App\Application\Event\Infrastructure\Symfony\Doctrine;
 
 use Exception;
 use Throwable;

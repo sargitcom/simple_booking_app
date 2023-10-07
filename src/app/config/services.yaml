@@ -23,5 +23,8 @@ services:
     App\Application\User\Account\Domain\UserRepository:
         class: App\Application\User\Account\Infrastructure\Symfony\Doctrine\SymfonyUserRepository
 
+    App\Application\Event\Domain\AvailableEventDayRepository:
+        class: App\Application\Event\Infrastructure\Symfony\Doctrine\SymfonyDoctrineAvailableEventDayRepository
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

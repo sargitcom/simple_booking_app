@@ -1,5 +1,7 @@
 <?php
 
+namespace App\Application\Event\Infrastructure\Symfony\Doctrine;
+
 use App\Application\Event\Domain\AvailableEventDay;
 use App\Application\Event\Domain\AvailableEventDayCollection;
 use App\Application\Event\Domain\Event;
@@ -7,6 +9,7 @@ use App\Application\Event\Domain\EventRepository;
 use App\Application\Event\Domain\FullEvent;
 use App\Application\Event\Domain\FullEventCollection;
 use App\Application\EventStore\Domain\ProjectionName;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Uid\Uuid;
@@ -44,9 +47,7 @@ class SymfonyDoctrineEventRepository extends ServiceEntityRepository implements 
     }
 
     public function getEventsWithSeats(DateTime $startDate, DateTime $endDate) : FullEventCollection
-    {
-        
-
+    {       
         $results = $this->getEventsCollection($startDate, $endDate);
 
         $collection = new FullEventCollection();
@@ -67,64 +68,6 @@ class SymfonyDoctrineEventRepository extends ServiceEntityRepository implements 
         $qb = $this->_em->createQueryBuilder();
         $query = $qb->select('e')
             ->from(Event::class, 'e')
-            ->getQuery();
-
-        return $query->getResult();
-    }
-
-    protected function getAvailableSeats(Uuid $eventId, DateTime $startDate, DateTime $endDate) : AvailableEventDayCollection
-    {
-        $availableSeats = $this->getAvailableSeatsByEvent($eventId, $startDate, $endDate);
-
-        $collection = new AvailableEventDayCollection();
-
-        /**
-         * @var AvailableEventDay $seatItem
-         */
-        foreach ($availableSeats as $seatItem) {
-            $collection->append($seatItem);
-        }
-
-        return $collection;
-    }
-
-    protected function getAvailableSeatsByEvent(Uuid $eventId, DateTime $startDate, DateTime $endDate) : array
-    {
-        $qb = $this->_em->createQueryBuilder();
-        $query = $qb->select('aed')
-            ->from(AvailableEventDay::class, 'aed')
-            ->where('eventId', '=', $eventId)
-            ->andWhere("TO_DATE(concat(year, '-', month, '-', day), 'YYYY-MM-DD')", ">=", $startDate->format('Y-m-d'))
-            ->andWhere("TO_DATE(concat(year, '-', month, '-', day), 'YYYY-MM-DD')", "<=", $endDate->format('Y-m-d'))
-            ->getQuery();
-
-        return $query->getResult();
-    }
-
-    protected function getReservedSeats(Uuid $eventId, DateTime $startDate, DateTime $endDate) : AvailableEventDayCollection
-    {
-        $availableSeats = $this->getAvailableSeatsByEvent($eventId, $startDate, $endDate);
-
-        $collection = new AvailableEventDayCollection();
-
-        /**
-         * @var AvailableEventDay $seatItem
-         */
-        foreach ($availableSeats as $seatItem) {
-            $collection->append($seatItem);
-        }
-
-        return $collection;
-    }
-
-    protected function getReservedSeatsByEvent(Uuid $eventId, DateTime $startDate, DateTime $endDate) : array
-    {
-        $qb = $this->_em->createQueryBuilder();
-        $query = $qb->select('aed')
-            ->from(AvailableEventDay::class, 'aed')
-            ->where('eventId', '=', $eventId)
-            ->andWhere("TO_DATE(concat(year, '-', month, '-', day), 'YYYY-MM-DD')", ">=", $startDate->format('Y-m-d'))
-            ->andWhere("TO_DATE(concat(year, '-', month, '-', day), 'YYYY-MM-DD')", "<=", $endDate->format('Y-m-d'))
             ->getQuery();
 
         return $query->getResult();

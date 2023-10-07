@@ -14,10 +14,10 @@ class ReservedEventDay extends AggregateRoot
     private EventDaySeats $reservedSeats;
 
     private function __construct(
-        Uuid $id, 
-        Uuid $eventId, 
-        DateTime $date, 
-        EventDaySeats $reservedSeats, 
+        Uuid $id,
+        Uuid $eventId,
+        DateTime $date,
+        EventDaySeats $reservedSeats,
         AgreggateVersion $agreggateVersion
     ) {
         $this->assertValidDate($date);

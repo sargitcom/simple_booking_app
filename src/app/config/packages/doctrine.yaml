@@ -1,4 +1,5 @@
 doctrine:
+
     dbal:
         url: '%env(resolve:DATABASE_URL)%'
 
@@ -55,6 +56,12 @@ doctrine:
                 dir: '%kernel.project_dir%/src/Application/Event/Infrastructure/Symfony/Doctrine/Mapping'
                 prefix: 'App\Application\Event\Domain'
                 alias: ReservedEventDay
+
+        dql:
+            datetime_functions:
+                to_date: DoctrineExtensions\Query\Postgresql\StrToDate
+
+
 when@test:
     doctrine:
         dbal:
