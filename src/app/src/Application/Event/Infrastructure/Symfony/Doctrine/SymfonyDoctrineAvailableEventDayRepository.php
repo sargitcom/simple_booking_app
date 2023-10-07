@@ -9,12 +9,14 @@ use App\Application\Event\Domain\AvailableEventDaysObsoleteVersionException;
 use App\Application\Event\Domain\Event;
 use App\Application\Event\Domain\FullEventCollection;
 use App\Application\Event\Domain\NotEnougthSeatsNumberException;
+use App\Application\Event\Infrastructure\Symfony\Doctrine\AvailableEventDaysObsoleteVersionException as DoctrineAvailableEventDaysObsoleteVersionException;
 use App\Application\EventStore\Domain\ProjectionName;
 use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Exception;
 use Symfony\Component\Uid\Uuid;
+use Throwable;
 
 /**
  * @extends ServiceEntityRepository<AvailableEventDay>
@@ -63,50 +65,22 @@ class SymfonyDoctrineAvailableEventDayRepository extends ServiceEntityRepository
 
         $availableEventDays = $this->getAvailableEventDaysSeatsByRange($uuid, $startDate, $endDate);
 
-        dd($availableEventDays);
-
-
-        /*
-        if ($this->isEnoughAvailableSeats($availableEventDays, $seatsNumber) === false) {
-            throw new Exception("Not enough seats");
+        if ($this->areEnoughtDaysInCollection($availableEventDays, $startDate, $endDate) === false) {
+            throw new Exception("There`s not enought seats available");
         }
-        */
 
-        /*
-        die('q');
+        $availableEventDays->reduceSeatsNumber($seatsNumber);
 
-        $isError = false;
-        $i = 0;
-        */
+        $this->_em->getConnection()->beginTransaction();
 
-        //do {
-            //try {
-              //  $i++;
+        try {
+            $this->updateAvailableEventDaysSeatsNumber($availableEventDays);
+        } catch(Throwable) {
+            $this->_em->getConnection()->rollBack();
+            throw new Exception("Can`t process seat update");
+        }
 
-                /**
-                * @throws Exception
-                */
-                //$this->updateAvailableEventDaysSeatsNumber($availableEventDays, $startDate, $endDate, $seatsNumber);
-
-
-                //$this->beginTransaction();
-
-                /**
-                * @throws Exception
-                */
-                //$this->tryToUpdateAvailableSeats($availableEventDays);
-
-                //$this->commitTransaction();
-
-            //  break;
-            //} catch (NotEnougthSeatsNumberException) {
-
-            //} catch (AvailableEventDaysObsoleteVersionException) {
-                //$this->rollbackTransaction();
-            //}
-        //} while ($i <= 5);
-
-        // tutaj walna error jezeli taka koniecznosc throw new CantUpd();
+        $this->_em->getConnection()->commit();
     }
 
     protected function areAvailableSeats(
@@ -139,15 +113,18 @@ SQL;
         return $results->fetchFirstColumn()[0] === $daysToReserve;
     }
 
-    protected function getAvailableEventDaysSeatsByRange(Uuid $eventId, DateTime $startDate, DateTime $endDate) : AvailableEventDayCollection
-    {
-
+    protected function getAvailableEventDaysSeatsByRange(
+        Uuid $eventId, 
+        DateTime $startDate, 
+        DateTime $endDate
+    ) : AvailableEventDayCollection {
         $qb = $this->_em->createQueryBuilder();
         $query = $qb->select('aed')
             ->from(AvailableEventDay::class, 'aed')
             ->where('aed.eventId = :eventId')
             ->andWhere("to_date(concat(aed.year, '-', aed.month, '-', aed.day), 'YYYY-MM-DD') >= :startDate")
             ->andWhere("to_date(concat(aed.year, '-', aed.month, '-', aed.day), 'YYYY-MM-DD') <= :endDate")
+            ->orderBy("to_date(concat(aed.year, '-', aed.month, '-', aed.day), 'YYYY-MM-DD')", "ASC")
             ->setParameter(':eventId', $eventId->toRfc4122())
             ->setParameter(':startDate', $startDate->format('Y-m-d'))
             ->setParameter(':endDate', $endDate->format('Y-m-d'))
@@ -167,22 +144,22 @@ SQL;
         return $collection;
     }
 
-    protected function updateAvailableEventDaysSeatsNumber()
+    protected function areEnoughtDaysInCollection(AvailableEventDayCollection $collection, DateTime $startDate, DateTime $endDate) : bool
     {
+        $interval = $startDate->diff($endDate);
+        $daysToReserve = $interval->days > 0 ? $interval->days + 1 : 1;
 
+        return $collection->count() === $daysToReserve;
     }
 
-    /**
-     * @throws AvailableEventDaysObsoleteVersionException
-     */
-    protected function tryToUpdateAvailableSeats(AvailableEventDayCollection $availableEventDays) : void
-    {
-        $availableEventDays->rewind();
-        while ($availableEventDays->valid())
-        {
-            $eventDay = $availableEventDays->current();
-            $this->tryToUpdateAvailableEventDay($eventDay);
-            $availableEventDays->next();
+    protected function updateAvailableEventDaysSeatsNumber(
+        AvailableEventDayCollection $availableEventDayCollection
+    ) {
+        $availableEventDayCollection->rewind();
+        while ($availableEventDayCollection->valid()) {
+            $seat = $availableEventDayCollection->current();
+            $this->tryToUpdateAvailableEventDay($seat);
+            $availableEventDayCollection->next();
         }
     }
 
@@ -197,15 +174,21 @@ SQL;
         $year = $availableEventDay->getYear();
         $version = $availableEventDay->getVersion();
 
-        $dql = 'UPDATE available_event_day SET seats = :seats WHERE day = :day AND month = :month AND year = :year AND version = :version';
-        $query = $this->getEntityManager()->createQuery($dql)
-            ->setParameter(':seats', $seats)
+        $class = AvailableEventDay::class;
+
+        $dql = <<<DQL
+UPDATE $class as aed 
+SET aed.availableSeats.seats = :seats, aed.version.version = aed.version.version + 1
+WHERE aed.day = :day AND aed.month = :month AND aed.year = :year AND aed.version.version = :version
+DQL;
+        $query = $this->getEntityManager()->createQuery($dql);
+        $query->setParameter(':seats', $seats)
             ->setParameter(':day', $day)
             ->setParameter(':month', $month)
             ->setParameter(':year', $year)
-            ->setParameter(':version', $version);
+            ->setParameter(':version', $version->getVersion());
         $rows = $query->execute();
 
-        if ($rows === 0 ) throw new AvailableEventDaysObsoleteVersionException();
+        if ($rows === 0 ) throw new DoctrineAvailableEventDaysObsoleteVersionException();
     }
 }

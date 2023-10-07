@@ -13,6 +13,13 @@ class AvailableEventDayCollection implements Iterator
      */
     private array $data = [];
 
+    public function reduceSeatsNumber(int $seatsNumber) : void
+    {
+        foreach ($this->data as $key => $seat) {
+            $this->data[$key] = $seat->reduceSeatsNumber(EventDaySeats::create($seatsNumber));
+        }
+    }
+
     public function append(AvailableEventDay $eventDay) : void
     {
         $this->data[] = $eventDay;
@@ -35,7 +42,7 @@ class AvailableEventDayCollection implements Iterator
 
     public function next(): void
     {
-        $this->index++;
+        ++$this->index;
     }
 
     public function rewind(): void
