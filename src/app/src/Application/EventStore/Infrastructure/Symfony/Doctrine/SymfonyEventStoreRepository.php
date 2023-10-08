@@ -41,9 +41,10 @@ class SymfonyEventStoreRepository extends ServiceEntityRepository implements Eve
     public function getEventsFrom(int $eventId): EventStoreCollection
     {
         $qb = $this->_em->createQueryBuilder();
-        $query = $qb->select('*')
+        $query = $qb->select('es')
             ->from(EventStore::class, 'es')
-            ->where('es.eventId > :eventId')
+            ->where('es.id >= :eventId')
+            ->orderBy('es.id', 'ASC')
             ->setParameter(":eventId", $eventId)
             ->getQuery();
 
@@ -72,6 +73,7 @@ SQL;
 
         while (true) {
             while ($message = $db->pgsqlGetNotify(PDO::FETCH_ASSOC, 30000)) {
+
                 $data = json_decode($message['payload'], true);
 
                 $callback($data['eventId']);

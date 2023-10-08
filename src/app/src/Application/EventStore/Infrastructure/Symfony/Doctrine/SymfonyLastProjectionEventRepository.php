@@ -33,25 +33,29 @@ class SymfonyLastProjectionEventRepository extends ServiceEntityRepository imple
     public function getProjectionsCurrentEventId(ProjectionName $projectionName): LastEventId
     {
         $qb = $this->_em->createQueryBuilder();
-        $query = $qb->select('*')
+        $query = $qb->select('lpe')
             ->from(LastProjectionEvent::class, 'lpe')
-            ->where('lpe.projectionName = :projectionName')
+            ->where('lpe.projectionName.projectionName = :projectionName')
             ->setParameter(":projectionName", $projectionName->getProjectionName())
             ->getQuery();
 
-        $result = $query->getSingleScalarResult();
+        $result = $query->getOneOrNullResult();
 
-        $eventId = $result !== null ? $result['lastEventId'] : 0;
-
-        return LastEventId::create($eventId);
+        return $result !== null ? $result->getLastEventId() : LastEventId::create(1);
     }
 
     public function updateProjectionCurrentEventId(ProjectionName $projectionName, LastEventId $lastEventId): void
     {
+        if ($this->getProjectionsCurrentEventId($projectionName)->getEventId() === 1) {
+            $entity = new LastProjectionEvent($projectionName, $lastEventId);
+            $this->getEntityManager()->persist($entity, true);
+            return;
+        }
+
         $qb = $this->_em->createQueryBuilder();
         $query = $qb->update(LastProjectionEvent::class, 'lpe')
-            ->where('lpe.projectionName = :projectionName')
-            ->set('lpe.lastEventId', $lastEventId->getEventId())
+            ->where('lpe.projectionName.projectionName = :projectionName')
+            ->set('lpe.lastEventId.eventId', $lastEventId->getEventId())
             ->setParameter(":projectionName", $projectionName->getProjectionName())
             ->getQuery();
         $query->execute();

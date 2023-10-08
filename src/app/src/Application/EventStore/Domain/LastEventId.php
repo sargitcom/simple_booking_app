@@ -4,7 +4,7 @@ namespace App\Application\EventStore\Domain;
 
 class LastEventId
 {
-    public const MIN_EVENT_ID = 0;
+    public const MIN_EVENT_ID = 1;
 
     private int $eventId;
 
@@ -21,7 +21,7 @@ class LastEventId
 
     protected function assertValidEventId(int $eventId) : void
     {
-        if ($eventId > self::MIN_EVENT_ID) {
+        if ($eventId >= self::MIN_EVENT_ID) {
             return;
         }
 

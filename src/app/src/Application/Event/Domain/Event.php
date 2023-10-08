@@ -8,10 +8,11 @@ class Event extends AggregateRoot
 {
     private EventName $eventName;
 
-    public function __construct(Uuid $id, EventName $eventName)
+    public function __construct(Uuid $id, EventName $eventName, AgreggateVersion $agreggateVersion)
     {
         $this->id = $id;
         $this->eventName = $eventName;
+        $this->version = $agreggateVersion;
     }
 
     public function updateName(EventName $eventName) : void
@@ -21,8 +22,7 @@ class Event extends AggregateRoot
         }
 
         $this->setEventName($eventName);
-
-        $this->raise(new UpdateEventEvent($this->getId(), $this->getEventName(), $this->incVersion()->getVersion()));
+        //$this->raise(new UpdateEventEven($this->getId(), $this->getEventName(), $this->incVersion()->getVersion()));
     }
 
     public function create() : void
