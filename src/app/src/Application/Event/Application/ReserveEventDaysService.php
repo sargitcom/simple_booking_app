@@ -66,7 +66,7 @@ class ReserveEventDaysService
                 ReserveEventDaysResponse::IS_ERROR,
                 'Seats not reserved. Unknown error.',
             );
-        }     
+        }
     }
 
     protected function reserveEventDaysSeats(

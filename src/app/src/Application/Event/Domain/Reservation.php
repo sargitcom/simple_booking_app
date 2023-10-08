@@ -3,32 +3,34 @@
 namespace App\Application\Event\Domain;
 
 use DateTime;
+use Exception;
 use Symfony\Component\Uid\Uuid;
 
-class ReservedEventDay extends AggregateRoot
+class Reservation extends AggregateRoot
 {
     private Uuid $eventId;
     private Uuid $reservationId;
-    private int $day;
-    private int $month;
-    private int $year;
+    private DateTime $startDate;
+    private DateTime $endDate;
     private EventDaySeats $reservedSeats;
 
     private function __construct(
         Uuid $id,
         Uuid $reservationId,
         Uuid $eventId,
-        DateTime $date,
+        DateTime $startDate,
+        DateTime $endDate,
         EventDaySeats $reservedSeats,
         AgreggateVersion $agreggateVersion
     ) {
-        $this->assertValidDate($date);
+        $this->assertValidStartDate($startDate);
+        $this->assertValidEndDate($startDate, $endDate);
+
         $this->setId($id);
         $this->setReservationId($reservationId);
         $this->setEventId($eventId);
-        $this->setDay($date->format('d'));
-        $this->setMonth($date->format('m'));
-        $this->setYear($date->format('Y'));
+        $this->setStartDate($startDate);
+        $this->setEndDate($endDate);
         $this->setReservedSeats($reservedSeats);
         $this->setAggregateVersion($agreggateVersion);
     }
@@ -37,16 +39,29 @@ class ReservedEventDay extends AggregateRoot
         Uuid $id, 
         Uuid $reservationId,
         Uuid $eventId, 
-        DateTime $date, 
+        DateTime $startDate, 
+        DateTime $endDate, 
         EventDaySeats $reservedSeats, 
         AgreggateVersion $agreggateVersion
     ) : self {
-        return new self($id, $reservationId, $eventId, $date, $reservedSeats, $agreggateVersion);
+        return new self($id, $reservationId, $eventId, $startDate, $endDate, $reservedSeats, $agreggateVersion);
     }
 
-    private function assertValidDate(DateTime $date)
+    private function assertValidStartDate(DateTime $date)
     {
-        return ValidateDate::create()->isDateEqualOrGreaterThanCurrentDate($date);
+        if (ValidateDate::create()->isDateEqualOrGreaterThanCurrentDate($date) === false) {
+            throw new Exception("Start date not current date or greater that current date exception");
+        }
+    }
+
+    private function assertValidEndDate(DateTime $startDate, DateTime $endDate) : void
+    {
+        $diff = $startDate->diff($endDate);
+        if ($diff->days >= 0) {
+            return;
+        }
+
+        throw new Exception("End date not equal or greater that start date exception");
     }
 
     private function setId(Uuid $id) : void
@@ -94,33 +109,23 @@ class ReservedEventDay extends AggregateRoot
         return $this->version;
     }
 
-    private function setDay(int $day) : void
+    public function setStartDate(DateTime $startDate) : void
     {
-        $this->day = $day;
+        $this->startDate = $startDate;
     }
 
-    public function getDay() : int
+    public function getStartDate() : DateTime
     {
-        return $this->day;
+        return $this->startDate;
     }
 
-    private function setMonth(int $month) : void
+    public function setEndDate(DateTime $endDate) : void
     {
-        $this->month = $month;
+        $this->endDate = $endDate;
     }
 
-    public function getMonth() : int
+    public function getEndDate() : DateTime
     {
-        return $this->month;
-    }
-
-    private function setYear(int $year) : void
-    {
-        $this->year = $year;
-    }  
-
-    public function getYear() : int
-    {
-        return $this->year;
+        return $this->endDate;
     }
 }

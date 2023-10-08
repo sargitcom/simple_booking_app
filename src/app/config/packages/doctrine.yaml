@@ -57,6 +57,13 @@ doctrine:
                 prefix: 'App\Application\Event\Domain'
                 alias: ReservedEventDay
 
+            App\Application\Event\Domain\Reservation:
+                is_bundle: false
+                type: xml
+                dir: '%kernel.project_dir%/src/Application/Event/Infrastructure/Symfony/Doctrine/Mapping'
+                prefix: 'App\Application\Event\Domain'
+                alias: Reservation
+
         dql:
             datetime_functions:
                 to_date: DoctrineExtensions\Query\Postgresql\StrToDate

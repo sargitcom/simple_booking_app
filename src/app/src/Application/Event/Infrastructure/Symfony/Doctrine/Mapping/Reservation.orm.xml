@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                          https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+
+    <entity name="App\Application\Event\Domain\Reservation" table="`reservation`">
+        <id name="id" type="uuid" unique="true" column="id" />
+        <field name="eventId" type="uuid" column="event_id" />
+        <field name="reservationId" type="uuid" column="reservation_id" />
+        <field name="startDate" type="datetime" column="start_date" />
+        <field name="endDate" type="datetime" column="end_date" />
+        <embedded name="reservedSeats" column="reserved_seats" class="App\Application\Event\Domain\EventDaySeats" use-column-prefix="false" />
+        <embedded name="version" column="version" class="App\Application\Event\Domain\AgreggateVersion" use-column-prefix="false" />
+    </entity>
+</doctrine-mapping>
