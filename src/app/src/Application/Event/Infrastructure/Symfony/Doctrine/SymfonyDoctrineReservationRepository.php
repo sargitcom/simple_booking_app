@@ -18,7 +18,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method Reservation[]    findAll()
  * @method Reservation[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class SymfonyDoctrineAvailableEventDayRepository extends ServiceEntityRepository implements ReservationRepository
+class SymfonyDoctrineReservationRepository extends ServiceEntityRepository implements ReservationRepository
 {
     public const PROJECTION_NAME = 'reservation';
     public const PERSISTS = true;

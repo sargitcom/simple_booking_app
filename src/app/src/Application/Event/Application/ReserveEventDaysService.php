@@ -6,6 +6,7 @@ use App\Application\Event\Domain\AvailableEventDayRepository;
 use App\Application\Event\Domain\CouldNotReserveSeatsException;
 use App\Application\Event\Domain\CouldNotSaveReservedDaysException;
 use App\Application\Event\Domain\NotEnoughtSeatsAvailableException;
+use App\Application\Event\Domain\ReservationService;
 use App\Application\Event\Domain\ReservedEventDayService;
 use App\Application\Event\Infrastructure\Symfony\Doctrine\AvailableEventDaysObsoleteVersionException;
 use DateTime;
@@ -17,7 +18,8 @@ class ReserveEventDaysService
 {
     public function __construct(
         private AvailableEventDayRepository $availableEventDaysRepository,
-        private ReservedEventDayService $reservedEventDayService, 
+        private ReservedEventDayService $reservedEventDayService,
+        private ReservationService $reservationService,
         private EntityManagerInterface $entityManager
     ) {}
 
@@ -69,6 +71,11 @@ class ReserveEventDaysService
         }
     }
 
+    /**
+     *
+     * here we can use distributed request - use watchar pattern to be sure that whole request is completed
+     * 
+     */
     protected function reserveEventDaysSeats(
         Uuid $eventId,
         Uuid $reservationId,
@@ -77,7 +84,7 @@ class ReserveEventDaysService
         int $seatsNumber,
     ) : void {
         $this->entityManager->getConnection()->beginTransaction();
-        try {
+        try { 
             $this->availableEventDaysRepository->reserveEventDays(
                 $eventId,
                 $startDate,
@@ -86,6 +93,14 @@ class ReserveEventDaysService
             );
 
             $this->reservedEventDayService->reserveEventDays(
+                $eventId,
+                $reservationId,
+                $startDate,
+                $endDate,
+                $seatsNumber
+            );
+
+            $this->reservationService->reserveEventDays(
                 $eventId,
                 $reservationId,
                 $startDate,
