@@ -15,29 +15,31 @@ class ReservedEventDayService
 
     public function reserveEventDays(
         Uuid $eventId,
+        Uuid $reservationId,
         DateTime $startDate,
         DateTime $endDate,
         int $seatsNumber
     ) : void {
         try {
             $interval = DateInterval::createFromDateString('1 day');
-            $period = new DatePeriod($startDate, $interval, $endDate);
+            $period = new DatePeriod($startDate, $interval, $endDate->add($interval));
 
             foreach ($period as $date) {
-                $this->reserveEventDay($eventId, $date, $seatsNumber);
+                $this->reserveEventDay($eventId, $reservationId, $date, $seatsNumber);
             }
-        } catch (Throwable) {
+        } catch (Throwable $e) {
             throw new CouldNotReserveSeatsException();
         }
     }
 
-    protected function reserveEventDay(Uuid $eventId, DateTime $date, int $seatsNumber)
+    protected function reserveEventDay(Uuid $eventId, Uuid $reservationId, DateTime $date, int $seatsNumber)
     {
         $aggregateId = Uuid::v4();
         $reservedSeats = EventDaySeats::create($seatsNumber);
 
         $event = new EventDayReservedEvent(
             $aggregateId,
+            $reservationId,
             $reservedSeats,
             $eventId,
             $date

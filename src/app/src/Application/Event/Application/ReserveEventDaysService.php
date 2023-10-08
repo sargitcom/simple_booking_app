@@ -28,8 +28,9 @@ class ReserveEventDaysService
             $startDate = $request->getStartDate();
             $endDate = $request->getEndDate();
             $seatsNumber = $request->getSeatsNumber();
+            $reservationId = Uuid::v4();
 
-            $this->reserveEventDaysSeats($eventId, $startDate, $endDate, $seatsNumber);
+            $this->reserveEventDaysSeats($eventId, $reservationId, $startDate, $endDate, $seatsNumber);
 
             return new ReserveEventDaysResponse(
                 $request->getEventId(),
@@ -70,6 +71,7 @@ class ReserveEventDaysService
 
     protected function reserveEventDaysSeats(
         Uuid $eventId,
+        Uuid $reservationId,
         DateTime $startDate,
         DateTime $endDate,
         int $seatsNumber,
@@ -85,6 +87,7 @@ class ReserveEventDaysService
 
             $this->reservedEventDayService->reserveEventDays(
                 $eventId,
+                $reservationId,
                 $startDate,
                 $endDate,
                 $seatsNumber

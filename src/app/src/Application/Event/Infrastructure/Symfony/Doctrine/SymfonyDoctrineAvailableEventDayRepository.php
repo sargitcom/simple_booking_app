@@ -42,7 +42,7 @@ class SymfonyDoctrineAvailableEventDayRepository extends ServiceEntityRepository
 
     public function addAvailableDays(Uuid $eventId, DateTime $startDate, DateTime $endDate, int $seatsNumber)
     {
-        
+
     }
 
     public function save(AvailableEventDay $entity, bool $flush = false): void
@@ -81,13 +81,13 @@ class SymfonyDoctrineAvailableEventDayRepository extends ServiceEntityRepository
         if ($shouldRetry && $retriesNumber === 0) throw new CouldNotReserveSeatsException();
     }
 
-    protected function tryToReserveEventDays(Uuid $uuid, DateTime $startDate, DateTime $endDate, int $seatsNumber) : void
+    protected function tryToReserveEventDays(Uuid $eventId, DateTime $startDate, DateTime $endDate, int $seatsNumber) : void
     {
-        if ($this->areAvailableSeats($uuid, $startDate, $endDate, $seatsNumber) === false) {
+        if ($this->areAvailableSeats($eventId, $startDate, $endDate, $seatsNumber) === false) {
             throw new NotEnoughtSeatsAvailableException("There`s not enought seats available");
         }
 
-        $availableEventDays = $this->getAvailableEventDaysSeatsByRange($uuid, $startDate, $endDate);
+        $availableEventDays = $this->getAvailableEventDaysSeatsByRange($eventId, $startDate, $endDate);
 
         if ($this->areEnoughtDaysInCollection($availableEventDays, $startDate, $endDate) === false) {
             throw new NotEnoughtSeatsAvailableException("There`s not enought seats available");

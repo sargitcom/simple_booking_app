@@ -41,13 +41,13 @@ class SymfonyDoctrineReservedEventDayRepository extends ServiceEntityRepository 
         return new ProjectionName(self::PROJECTION_NAME);
     }
 
-    public function reserveEventDays(Uuid $eventId, DateTime $startDate, DateTime $endDate, int $seats) : void
+    public function reserveEventDays(Uuid $eventId, Uuid $reservationId, DateTime $startDate, DateTime $endDate, int $seats) : void
     {
         $this->getEntityManager()->getConnection()->beginTransaction();
 
         try {
             $interval = DateInterval::createFromDateString('1 day');
-            $period = new DatePeriod($startDate, $interval, $endDate);
+            $period = new DatePeriod($startDate, $interval, $endDate->add($interval));
 
             foreach ($period as $date) {
                 $id = Uuid::v4();
@@ -56,6 +56,7 @@ class SymfonyDoctrineReservedEventDayRepository extends ServiceEntityRepository 
 
                 $entity = new ReservedEventDay(
                     $id,
+                    $reservationId,
                     $eventId,
                     $date,
                     $reservedSeats,

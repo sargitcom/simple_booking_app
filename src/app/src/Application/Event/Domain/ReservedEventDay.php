@@ -8,6 +8,7 @@ use Symfony\Component\Uid\Uuid;
 class ReservedEventDay extends AggregateRoot
 {
     private Uuid $eventId;
+    private Uuid $reservationId;
     private int $day;
     private int $month;
     private int $year;
@@ -15,6 +16,7 @@ class ReservedEventDay extends AggregateRoot
 
     private function __construct(
         Uuid $id,
+        Uuid $reservationId,
         Uuid $eventId,
         DateTime $date,
         EventDaySeats $reservedSeats,
@@ -22,6 +24,7 @@ class ReservedEventDay extends AggregateRoot
     ) {
         $this->assertValidDate($date);
         $this->setId($id);
+        $this->setReservationId($reservationId);
         $this->setEventId($eventId);
         $this->setDay($date->format('d'));
         $this->setMonth($date->format('m'));
@@ -32,12 +35,13 @@ class ReservedEventDay extends AggregateRoot
 
     static function create(
         Uuid $id, 
+        Uuid $reservationId,
         Uuid $eventId, 
         DateTime $date, 
         EventDaySeats $reservedSeats, 
         AgreggateVersion $agreggateVersion
     ) : self {
-        return new self($id, $eventId, $date, $reservedSeats, $agreggateVersion);
+        return new self($id, $reservationId, $eventId, $date, $reservedSeats, $agreggateVersion);
     }
 
     private function assertValidDate(DateTime $date)
@@ -48,6 +52,16 @@ class ReservedEventDay extends AggregateRoot
     private function setId(Uuid $id) : void
     {
         $this->id = $id;
+    }
+
+    private function setReservationId(Uuid $eventId) : void
+    {
+        $this->eventId = $eventId;
+    }
+
+    public function getReservationId() : Uuid
+    {
+        return $this->eventId;
     }
 
     private function setEventId(Uuid $eventId) : void
