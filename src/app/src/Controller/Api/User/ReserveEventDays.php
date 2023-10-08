@@ -2,8 +2,8 @@
 
 namespace App\Controller\Api\User;
 
-use App\Application\Event\Application\ReserveEventDaysRequest;
-use App\Application\Event\Application\ReserveEventDaysService;
+use App\Application\Event\Application\ReserveEventDays\ReserveEventDaysRequest;
+use App\Application\Event\Application\ReserveEventDays\ReserveEventDays as ReserveEventDaysApplication;
 use App\Application\Event\Domain\EventDaySeats;
 use DateTime;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -16,7 +16,7 @@ use Throwable;
 
 class ReserveEventDays extends AbstractController
 {
-    public function __construct(private ReserveEventDaysService $reserveEventDaysService) {}
+    public function __construct(private ReserveEventDaysApplication $reserveEventDaysService) {}
 
     #[Route(
         path: '/api/reserved_event_days/{eventId}',

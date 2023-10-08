@@ -2,8 +2,8 @@
 
 namespace App\Controller\Api\Admin;
 
-use App\Application\Event\Application\AddEvent as ApplicationAddEvent;
-use App\Application\Event\Application\AddEventRequest;
+use App\Application\Event\Application\AddEvent\AddEvent as ApplicationAddEvent;
+use App\Application\Event\Application\AddEvent\AddEventRequest;
 use App\Application\Event\Domain\EventName;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Application\Event\Application;
+namespace App\Application\Event\Application\ReserveEventDays;
 
 use App\Application\Event\Domain\EventDaySeats;
 use DateTime;

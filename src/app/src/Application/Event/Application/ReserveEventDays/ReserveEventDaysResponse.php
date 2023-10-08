@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Application\Event\Application;
+namespace App\Application\Event\Application\ReserveEventDays;
 
 use Symfony\Component\Uid\Uuid;
 

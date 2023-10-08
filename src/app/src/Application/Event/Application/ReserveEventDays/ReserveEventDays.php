@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Application\Event\Application;
+namespace App\Application\Event\Application\ReserveEventDays;
 
 use App\Application\Event\Domain\AvailableEventDayRepository;
 use App\Application\Event\Domain\CouldNotReserveSeatsException;
@@ -14,7 +14,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Uid\Uuid;
 use Throwable;
 
-class ReserveEventDaysService
+class ReserveEventDays
 {
     public function __construct(
         private AvailableEventDayRepository $availableEventDaysRepository,

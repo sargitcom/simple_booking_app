@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Application\Event\Application;
+namespace App\Application\Event\Application\AddEvent;
 
 use App\Application\Event\Domain\CreateEventEvent;
 use App\Application\EventStore\Application\InsertDomainEvent;
