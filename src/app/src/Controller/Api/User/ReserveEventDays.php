@@ -4,6 +4,7 @@ namespace App\Controller\Api\User;
 
 use App\Application\Event\Application\ReserveEventDaysRequest;
 use App\Application\Event\Application\ReserveEventDaysService;
+use App\Application\Event\Domain\EventDaySeats;
 use DateTime;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -30,7 +31,7 @@ class ReserveEventDays extends AbstractController
             $eventId = Uuid::fromString($eventId ?? "");
             $startDate = new DateTime($data['startAt'] ?? "");
             $endDate = new DateTime($data['endAt'] ?? "");
-            $seatsNumber = $data['seats'] ?? "";
+            $seatsNumber = EventDaySeats::create($data['seats'] ?? "");
     
             $reserveRequest = new ReserveEventDaysRequest($eventId, $startDate, $endDate, $seatsNumber);
     
@@ -50,7 +51,7 @@ class ReserveEventDays extends AbstractController
             ];
     
             return new JsonResponse($response);
-        } catch (Throwable) {
+        } catch (Throwable $e) {
             return new JsonResponse([
                 'msg' => 'Uknown error',
                 'isError' => true,

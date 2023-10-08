@@ -2,6 +2,7 @@
 
 namespace App\Application\Event\Application;
 
+use App\Application\Event\Domain\EventDaySeats;
 use DateTime;
 use Symfony\Component\Uid\Uuid;
 
@@ -11,7 +12,7 @@ class ReserveEventDaysRequest
         private Uuid $eventId,
         private DateTime $startDate,
         private DateTime $endDate,
-        private int $seatsNumber
+        private EventDaySeats $seatsNumber,
     ) {}
 
     public function getEventId() : Uuid
@@ -31,6 +32,6 @@ class ReserveEventDaysRequest
 
     public function getSeatsNumber() : int
     {
-        return $this->seatsNumber;
+        return $this->seatsNumber->getSeatsNumber();
     }
 }

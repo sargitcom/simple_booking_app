@@ -40,6 +40,11 @@ class SymfonyDoctrineAvailableEventDayRepository extends ServiceEntityRepository
         return new ProjectionName(self::PROJECTION_NAME);
     }
 
+    public function addAvailableDays(Uuid $eventId, DateTime $startDate, DateTime $endDate, int $seatsNumber)
+    {
+        
+    }
+
     public function save(AvailableEventDay $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);

@@ -26,5 +26,8 @@ services:
     App\Application\Event\Domain\AvailableEventDayRepository:
         class: App\Application\Event\Infrastructure\Symfony\Doctrine\SymfonyDoctrineAvailableEventDayRepository
 
+    App\Application\Event\Domain\ReservedEventDayService:
+        class: App\Application\Event\Domain\ReservedEventDayService
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
