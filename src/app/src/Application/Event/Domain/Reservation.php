@@ -9,13 +9,11 @@ use Symfony\Component\Uid\Uuid;
 class Reservation extends AggregateRoot
 {
     private Uuid $eventId;
-    private Uuid $reservationId;
     private DateTime $startDate;
     private DateTime $endDate;
     private EventDaySeats $reservedSeats;
 
     private function __construct(
-        Uuid $id,
         Uuid $reservationId,
         Uuid $eventId,
         DateTime $startDate,
@@ -26,8 +24,7 @@ class Reservation extends AggregateRoot
         $this->assertValidStartDate($startDate);
         $this->assertValidEndDate($startDate, $endDate);
 
-        $this->setId($id);
-        $this->setReservationId($reservationId);
+        $this->setId($reservationId);
         $this->setEventId($eventId);
         $this->setStartDate($startDate);
         $this->setEndDate($endDate);
@@ -37,14 +34,13 @@ class Reservation extends AggregateRoot
 
     static function create(
         Uuid $id, 
-        Uuid $reservationId,
         Uuid $eventId, 
         DateTime $startDate, 
         DateTime $endDate, 
         EventDaySeats $reservedSeats, 
         AgreggateVersion $agreggateVersion
     ) : self {
-        return new self($id, $reservationId, $eventId, $startDate, $endDate, $reservedSeats, $agreggateVersion);
+        return new self($id, $eventId, $startDate, $endDate, $reservedSeats, $agreggateVersion);
     }
 
     private function assertValidStartDate(DateTime $date)
@@ -67,16 +63,6 @@ class Reservation extends AggregateRoot
     private function setId(Uuid $id) : void
     {
         $this->id = $id;
-    }
-
-    private function setReservationId(Uuid $reservationId) : void
-    {
-        $this->reservationId = $reservationId;
-    }
-
-    public function getReservationId() : Uuid
-    {
-        return $this->reservationId;
     }
 
     private function setEventId(Uuid $eventId) : void
