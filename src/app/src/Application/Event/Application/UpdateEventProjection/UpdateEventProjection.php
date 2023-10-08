@@ -10,6 +10,7 @@ use App\Application\Event\Infrastructure\Symfony\Doctrine\SymfonyDoctrineEventRe
 use App\Application\EventStore\Domain\EventStoreRepository;
 use App\Application\EventStore\Domain\LastEventId;
 use App\Application\EventStore\Domain\LastProjectionEventRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Uid\Uuid;
 
 class UpdateEventProjection
@@ -18,21 +19,25 @@ class UpdateEventProjection
         private EventStoreRepository $symfonyEventStoreRepository,
         private LastProjectionEventRepository $lastProjectionEventRepository,
         private EventRepository $eventRepository,
+        private EntityManagerInterface $entityManagerInterface
     ) {}
 
     public function updateProjection() : void
     {
-        $this->symfonyEventStoreRepository->listenEvents(fn(string $eventId )=> $this->tryUpdateProjection());
+        $this->symfonyEventStoreRepository->listenEvents(
+            fn(string $eventId) => $this->tryToUpdateProjection()
+        );
     }
 
-    private function tryUpdateProjection()
+    protected function tryToUpdateProjection() : void
     {
+        $this->entityManagerInterface->clear();
+
         $eventId = $this->lastProjectionEventRepository->getProjectionsCurrentEventId(
             SymfonyDoctrineEventRepository::getProjectionName()
         );
 
         $events = $this->symfonyEventStoreRepository->getEventsFrom($eventId->getEventId());
-
 
         $events->rewind();
 
@@ -47,11 +52,13 @@ class UpdateEventProjection
             $eventBody = json_decode($event->getEventBody(), true);
 
             $aggregateId = Uuid::fromString($event->getAggregateId());
+
             $eventName = EventName::create($eventBody["eventName"]);
             $eventVersion = AgreggateVersion::create($eventBody["version"]);
-                      
-            $this->tryToInsertNewEvent($aggregateId, $eventName, $eventVersion);
-
+            
+            $entity = new Event($aggregateId, $eventName, $eventVersion);
+            $this->eventRepository->save($entity, true);
+ 
             $eventId = $event->getId();
 
             $this->lastProjectionEventRepository->updateProjectionCurrentEventId(
@@ -61,11 +68,5 @@ class UpdateEventProjection
 
             $events->next();
         }
-    }
-
-    private function tryToInsertNewEvent(Uuid $aggregateId, EventName $eventName, AgreggateVersion $eventVersion) : void
-    {
-        $entity = new Event($aggregateId, $eventName, $eventVersion);
-        $this->eventRepository->save($entity, true);
     }
 }

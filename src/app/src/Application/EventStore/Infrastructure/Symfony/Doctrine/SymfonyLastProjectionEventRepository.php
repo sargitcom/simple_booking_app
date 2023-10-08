@@ -10,6 +10,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Doctrine\Persistence\ManagerRegistry;
+use Throwable;
 
 /**
  * @extends SymfonyEventStoreRepository<LastProjectionEvent>
@@ -46,18 +47,21 @@ class SymfonyLastProjectionEventRepository extends ServiceEntityRepository imple
 
     public function updateProjectionCurrentEventId(ProjectionName $projectionName, LastEventId $lastEventId): void
     {
-        if ($this->getProjectionsCurrentEventId($projectionName)->getEventId() === 1) {
-            $entity = new LastProjectionEvent($projectionName, $lastEventId);
-            $this->getEntityManager()->persist($entity, true);
-            return;
-        }
+        $sql = <<<SQL
+INSERT INTO last_event_store_projection_event (id, event_id, projection_name)
+VALUES(nextval('last_projection_event_store_seq'), :eventId, :projectionName)
+ON CONFLICT (projection_name) 
+DO 
+   UPDATE SET event_id = :eventId2;
+SQL;
 
-        $qb = $this->_em->createQueryBuilder();
-        $query = $qb->update(LastProjectionEvent::class, 'lpe')
-            ->where('lpe.projectionName.projectionName = :projectionName')
-            ->set('lpe.lastEventId.eventId', $lastEventId->getEventId())
-            ->setParameter(":projectionName", $projectionName->getProjectionName())
-            ->getQuery();
-        $query->execute();
+        $conn = $this->getEntityManager()->getConnection();
+
+        $stmt = $conn->prepare($sql);
+        $stmt->bindValue(':eventId', $lastEventId->getEventId());
+        $stmt->bindValue(':eventId2', $lastEventId->getEventId());
+        $stmt->bindValue(':projectionName', $projectionName->getProjectionName());
+
+        $stmt->executeQuery();
     }
 }

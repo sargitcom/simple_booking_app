@@ -43,7 +43,7 @@ class SymfonyEventStoreRepository extends ServiceEntityRepository implements Eve
         $qb = $this->_em->createQueryBuilder();
         $query = $qb->select('es')
             ->from(EventStore::class, 'es')
-            ->where('es.id >= :eventId')
+            ->where('es.id > :eventId')
             ->orderBy('es.id', 'ASC')
             ->setParameter(":eventId", $eventId)
             ->getQuery();

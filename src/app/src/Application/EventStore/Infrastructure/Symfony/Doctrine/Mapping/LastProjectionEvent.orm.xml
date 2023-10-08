@@ -5,9 +5,9 @@
                           https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
 
     <entity name="App\Application\EventStore\Domain\LastProjectionEvent" table="`last_event_store_projection_event`">
-        <id name="id" type="bigint" column="id">
+        <id name="id" type="bigint">
             <generator strategy="SEQUENCE" />
-            <sequence-generator sequence-name="event_store_seq" allocation-size="1" initial-value="1" />
+            <sequence-generator sequence-name="last_projection_event_store_seq" allocation-size="100" initial-value="1" />
         </id>
 
         <embedded name="lastEventId" column="last_event_id"  class="App\Application\EventStore\Domain\LastEventId" use-column-prefix="false" />
