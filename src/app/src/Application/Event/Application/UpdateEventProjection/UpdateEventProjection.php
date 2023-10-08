@@ -55,9 +55,8 @@ class UpdateEventProjection
 
             $eventName = EventName::create($eventBody["eventName"]);
             $eventVersion = AgreggateVersion::create($eventBody["version"]);
-            
-            $entity = new Event($aggregateId, $eventName, $eventVersion);
-            $this->eventRepository->save($entity, true);
+
+            $this->saveEventInProjection($aggregateId, $eventName, $eventVersion);
  
             $eventId = $event->getId();
 
@@ -68,5 +67,14 @@ class UpdateEventProjection
 
             $events->next();
         }
+    }
+
+    private function saveEventInProjection(
+        Uuid $aggregateId, 
+        EventName $eventName, 
+        AgreggateVersion $eventVersion
+    ) {
+        $entity = new Event($aggregateId, $eventName, $eventVersion);
+        $this->eventRepository->save($entity, true);
     }
 }
