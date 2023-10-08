@@ -21,7 +21,6 @@ class Reservation extends AggregateRoot
         EventDaySeats $reservedSeats,
         AgreggateVersion $agreggateVersion
     ) {
-        $this->assertValidStartDate($startDate);
         $this->assertValidEndDate($startDate, $endDate);
 
         $this->setId($reservationId);
@@ -41,13 +40,6 @@ class Reservation extends AggregateRoot
         AgreggateVersion $agreggateVersion
     ) : self {
         return new self($id, $eventId, $startDate, $endDate, $reservedSeats, $agreggateVersion);
-    }
-
-    private function assertValidStartDate(DateTime $date)
-    {
-        if (ValidateDate::create()->isDateEqualOrGreaterThanCurrentDate($date) === false) {
-            throw new Exception("Start date not current date or greater that current date exception");
-        }
     }
 
     private function assertValidEndDate(DateTime $startDate, DateTime $endDate) : void

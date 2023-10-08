@@ -29,8 +29,6 @@ class ValidateDate
                     return false;
                 }
             }
-
-            return true;
         }
 
         return true;

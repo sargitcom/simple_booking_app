@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Application\Event\Application\UpdateEventReservedDaysProjection;
+namespace App\Application\Event\Application\UpdateReservationProjection;
 
 use App\Application\Event\Domain\AgreggateVersion;
 use App\Application\Event\Domain\EventDaySeats;
@@ -14,7 +14,7 @@ use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Uid\Uuid;
 
-class UpdateReservatnionProjection
+class UpdateReservationProjection
 {
     public function __construct(
         private EventStoreRepository $symfonyEventStoreRepository,
@@ -45,7 +45,7 @@ class UpdateReservatnionProjection
         while ($events->valid()) {
             $event = $events->current();
 
-            if ($event->getEventName() !== "EventDayReservedEvent") {
+            if ($event->getEventName() !== "CreateReservationEvent") {
                 $events->next();
                 continue;    
             }
